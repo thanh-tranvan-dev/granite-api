@@ -4,9 +4,9 @@
     environment:
       POSTGRES_DB: granite
       POSTGRES_USER: granite
-      POSTGRES_PASSWORD: granite
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
     ports:
-      - "55432:5432"
+      - "127.0.0.1:55432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -18,10 +18,12 @@
   api:
     build: .
     environment:
-      DATABASE_URL: postgresql+psycopg://granite:granite@db:5432/granite
+      DATABASE_URL: postgresql+psycopg://granite:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@db:5432/granite
       CORS_ORIGINS: http://localhost:3000
+      RATE_LIMIT_SALT: ${RATE_LIMIT_SALT:?Set RATE_LIMIT_SALT in .env}
+      TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY:?Set TURNSTILE_SECRET_KEY in .env}
     ports:
-      - "8000:8000"
+      - "127.0.0.1:${API_PORT:-8001}:8000"
     depends_on:
       db:
         condition: service_healthy

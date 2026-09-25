@@ -19,6 +19,7 @@ class LeadCreate(BaseModel):
     area: ShortText = None
     stone_type: ShortText = None
     expected_size: ShortText = None
+    turnstile_token: Annotated[str, Field(min_length=1, max_length=2048)]
 
 
 class LeadCreated(BaseModel):
