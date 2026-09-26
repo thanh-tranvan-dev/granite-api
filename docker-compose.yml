@@ -18,10 +18,13 @@
   api:
     build: .
     environment:
-      DATABASE_URL: postgresql+psycopg://granite:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@db:5432/granite
-      CORS_ORIGINS: http://localhost:3000
+      DATABASE_URL: postgresql+psycopg://granite:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env.development}@db:5432/granite
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
       RATE_LIMIT_SALT: ${RATE_LIMIT_SALT:?Set RATE_LIMIT_SALT in .env}
       TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY:?Set TURNSTILE_SECRET_KEY in .env}
+      TURNSTILE_HOSTNAME: ${TURNSTILE_HOSTNAME:-}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
     ports:
       - "127.0.0.1:${API_PORT:-8001}:8000"
     depends_on:

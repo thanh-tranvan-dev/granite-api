@@ -1,5 +1,6 @@
 ﻿from __future__ import annotations
 
+import logging
 import os
 import re
 from contextlib import asynccontextmanager
@@ -15,6 +16,9 @@ from app.database import Base, SessionLocal, engine
 from app.models import Lead
 from app.schemas import LeadCreate, LeadCreated
 from app.security import check_rate_limit, client_ip, verify_turnstile
+from app.telegram import send_telegram_notification
+
+logger = logging.getLogger(__name__)
 
 ORIGINS = [value.strip() for value in os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",") if value.strip()]
 
@@ -91,5 +95,12 @@ def create_lead(payload: LeadCreate, request: Request) -> LeadCreated:
     except SQLAlchemyError as exc:
         # Do not log submitted contact details.
         raise HTTPException(status_code=503, detail="Tạm thời chưa thể lưu yêu cầu. Vui lòng thử lại.") from exc
+
+    try:
+        send_telegram_notification(lead)
+        logger.info("Telegram notification sent successfully")
+    except Exception as exc:
+        # Notification errors must never change the saved quotation's response.
+        logger.error("Telegram notification failed (%s)", type(exc).__name__)
 
     return LeadCreated(id=lead.id, received_at=lead.created_at)

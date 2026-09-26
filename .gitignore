@@ -2,4 +2,6 @@
 *.py[cod]
 .venv/
 .env
+.env.development
+.env.production
 *.db
